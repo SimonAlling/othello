@@ -1,0 +1,197 @@
+/* Let's default this puppy out
+-------------------------------------------------------------------------------*/
+
+html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, time, mark, audio, video {
+margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
+font-size: 100%;
+vertical-align: baseline;
+background: transparent;
+-webkit-user-select: none;
+}
+
+article, aside, figure, footer, header, hgroup, nav, section {display: block;}
+
+body {
+	background-color: black;
+	font-family: arial, sans-serif;
+	height: 1024px;
+	width: 768px;
+}
+
+#gameWrapper {
+	background-image: url('pic/background.png');
+	height: 1024px;
+	width: 768px;
+	z-index: 2;
+}
+
+#whiteArea {
+	height: 128px;
+	width: 768px;
+}
+
+.sideBox {
+	display: block;
+	float: left;
+	height: 128px;
+	width: 96px;
+}
+
+.flip {
+	-moz-transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+}
+
+.sideBoxButtonWrapper {
+	margin: 16px 16px 0 16px;
+	width: 64px;
+}
+
+.btnOpenMenu {
+	background-image: url('pic/sprites.png');
+	background-position: 0 0;
+	height: 30px;
+	width: 64px;
+}
+
+.btnOpenMenu:active {
+	background-position: -64px 0;
+}
+
+#whiteHolder {
+	display: block;
+	float: left;
+	width: 576px;
+	height: 128px;
+}
+
+#white {
+	display: block;
+	margin-top: 16px;
+}
+
+#can {
+	display: block;
+}
+
+#blackArea {
+	height: 128px;
+	width: 768px;
+}
+
+#blackHolder {
+	display: block;
+	float: left;
+	width: 576px;
+	height: 128px;
+}
+
+#black {
+	display: block;
+	margin-top: 16px;
+}
+
+#menuWrapper {
+	background-color: rgba(255,0,0,0.5);
+	display: none;
+	height: 1024px;
+	margin-top: -1024px;
+	position: relative;
+	width: 768px;
+	z-index: 999;
+}
+
+#menuWhite {
+	height: 128px;
+	width: 768px;
+}
+
+#menuBoard {
+	height: 768px;
+	width: 768px;
+}
+
+#menuBlack {
+	height: 128px;
+	width: 768px;
+}
+
+#confirmOverlay {
+	height: 1024px;
+	margin-top: -1024px;
+	position: relative;
+	width: 768px;
+	z-index: 700;
+}
+
+#confirmWhiteWrapper, #confirmBlackWrapper {
+	height: 128px;
+}
+
+.confirmWrapper {
+	background: -moz-linear-gradient(top,  #b2b2b2 0%, #f4f4f4 50%, #b2b2b2 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b2b2b2), color-stop(50%,#f4f4f4), color-stop(100%,#b2b2b2)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* IE10+ */
+	background: linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* W3C */
+	border: 1px black solid;
+	border-radius: 12px;
+	-webkit-border-radius: 12px;
+	height: 144px;
+	margin: 0 auto 0 auto;
+	position: relative;
+	top: 140px;
+	transition: top 0.2s;
+	-moz-transition: top 0.2s;
+	-webkit-transition: top 0.2s;
+	width: 576px;
+}
+
+.confirmNo {
+	background-image: url('pic/sprites.png');
+	background-position: 0 -30px;
+	float: left;
+	height: 56px;
+	margin: 16px;
+	width: 264px;
+}
+
+.confirmNo:active {
+	background-position: 0 -86px;
+}
+
+.confirmYes {
+	background-image: url('pic/sprites.png');
+	background-position: 0 -142px;
+	float: left;
+	height: 56px;
+	margin: 16px 0 0 0;
+	width: 264px;
+}
+
+.confirmYes:active {
+	background-position: 0 -198px;
+}
+
+#confirmBoard {
+	height: 768px;
+}
+
+#overlay {
+	height: 1024px;
+	margin-top: -1024px;
+	position: relative;
+	width: 768px;
+	z-index: 900;
+}
+
+#held {
+	display: none;
+	left: 0px;
+	position: absolute;
+	top: 0px;
+}

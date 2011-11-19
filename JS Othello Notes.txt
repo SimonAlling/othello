@@ -1,0 +1,5 @@
+Dimensioner:
+
+Ruta: 90px * 90px
+
+Kant: 6px

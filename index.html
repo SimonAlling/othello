@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>JavaScript Othello</title>
+
+<meta charset="utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="viewport" content="user-scalable=no, width=768" />
+
+<link rel="stylesheet" href="jso/jso.css" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<link rel="apple-touch-startup-image" href="./startup.png" />
+
+<script src="jso/jso.js"></script>
+<script src="jso/json/json2.js"></script>
+
+</head>
+
+<body ontouchmove="BlockMove(event);" onload="load();">
+
+<div id="wrapper">
+	<div id="gameWrapper">
+		<div id="whiteArea" class="flip">
+			<div class="sideBox">
+			</div>
+			<div id="whiteHolder">
+				<canvas id="white" width="576" height="88"></canvas>
+			</div>
+			<div class="sideBox">
+				<div class="sideBoxButtonWrapper">
+					<div class="btnOpenMenu button" data-c="btnOpenMenu"></div>
+				</div>
+			</div>
+		</div>
+		<div id="board">
+			<canvas id="can" width="768" height="768"></canvas>
+		</div>
+		<div id="blackArea">
+			<div class="sideBox"></div>
+			<div id="blackHolder">
+				<canvas id="black" width="576" height="88"></canvas>
+			</div>
+			<div class="sideBox">
+				<div class="sideBoxButtonWrapper">
+					<div class="btnOpenMenu button" data-c="btnOpenMenu"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="confirmOverlay">
+		<div id="confirmWhiteWrapper" class="flip">
+			<div id="confirmWWhite" class="confirmWrapper">
+				<div id="confirmWhiteNo" class="confirmNo">
+			
+				</div>
+				<div id="confirmWhiteYes" class="confirmYes">
+			
+				</div>
+			</div>
+		</div>
+		<div id="confirmBoard"></div>
+		<div id="confirmBlackWrapper">
+			<div id="confirmWBlack" class="confirmWrapper">
+				<div id="confirmBlackNo" class="confirmNo">
+			
+				</div>
+				<div id="confirmBlackYes" class="confirmYes">
+			
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="overlay">
+		<img id="held" src="jso/pic/tp.png" width="576" height="88" />
+	</div>
+	<div id="menuWrapper">
+		<div id="menuWhite">
+		
+		</div>
+		<div id="menuBoard">
+			
+		</div>
+		<div id="menuBlack">
+		
+		</div>
+	</div>
+</div>
+
+</body>
+
+</html>
