@@ -317,8 +317,43 @@ function square(xPos, yPos) {
 	};
 }
 
-function validateMove() {
+function flips(c, xStart, yStart, xInc, yInc) {
+	var f = 0;
+	var oc = 'white'; // opponent's color
+	if (c === 'white') oc = 'black';
+	var curX = xStart+xInc;
+	var curY = yStart+yInc;
+	while (curX >= 0 && curX < jso.bWidth && curY > 0 && curY < jso.bHeight) {
+		if (jso.board[curX][curY].state === 0) {
+			f = 0;
+			break;
+		}
+		else if (jso.board[curX][curY].color === c) {
+			break;
+		}
+		else {
+			f++;
+			curX += xInc;
+			curY += yInc;
+		}
+	}
+	return f;
+}
 
+function validateMove(color, x, y) {
+	var myReturn = false;
+	var numFlipped = 0;
+	//numFlipped += flips(color, x, y, 0, -1);
+	numFlipped += (flips(color, x, y, 0, -1));
+	numFlipped += (flips(color, x, y, 1, -1));
+	numFlipped += (flips(color, x, y, 1, 0));
+	numFlipped += (flips(color, x, y, 1, 1));
+	numFlipped += (flips(color, x, y, 0, 1));
+	numFlipped += (flips(color, x, y, -1, 1));
+	numFlipped += (flips(color, x, y, -1, 0));
+	numFlipped += (flips(color, x, y, -1, -1));
+	if (numFlipped > 0) { myReturn = true; }
+	return myReturn;
 }
 
 function placeBrick(color, xPos, yPos) {
@@ -368,7 +403,10 @@ function assignListeners() {
 			(768 - findPos(n.confirmWhiteYes)[0]),
 			(jso.confirmOffsetTop+n.confirmWhiteYes.offsetHeight-1)
 		)) {
-			if (validateMove()) {
+			var c = jso.turn;
+			var x = pixToSq(jso.move.x);
+			var y = pixToSq(jso.move.y-128);
+			if (validateMove(c, x, y)) {
 				nextTurn();
 			}
 			else {
@@ -387,7 +425,10 @@ function assignListeners() {
 	}, false);
 	n.confirmBlackYes.addEventListener('touchend', function() {
 		if (jso.confirmBlackVis === 1 && touching(event, n.confirmBlackYes)) {
-			if (validateMove()) {
+			var c = jso.turn;
+			var x = pixToSq(jso.move.x);
+			var y = pixToSq(jso.move.y-128);
+			if (validateMove(c, x, y)) {
 				nextTurn();
 			}
 			else {
