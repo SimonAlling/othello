@@ -336,20 +336,31 @@ function flips(c, xStart, yStart, xInc, yInc) {
 	if (c === 'white') oc = 'black';
 	var curX = xStart+xInc;
 	var curY = yStart+yInc;
-	while (curX >= 0 && curX < jso.bWidth && curY > 0 && curY < jso.bHeight) {
-		if (jso.board[curX][curY].state === 0) {
+	var gonnaFlip = [];
+	while (curX > -3 && curX < jso.bWidth+3 && curY > -3 && curY < jso.bHeight+3) {
+	
+		if ((curX >= jso.bHeight+1 || curY >= jso.bHeight+1 || curX <= -1 || curY <= -1)) {
 			f = 0;
+			gonnaFlip = [];
 			break;
 		}
-		else if (jso.board[curX][curY].color === c) {
+		else if (jso.board[curX][curY].state === 1 && jso.board[curX][curY].color === c) {
 			break;
 		}
-		else {
+		else if ((jso.board[curX][curY].state === 0)) {
+			f = 0;
+			gonnaFlip = [];
+			break;
+		}
+		else if (jso.board[curX][curY].state === 1 && jso.board[curX][curY].color === oc) {
 			f++;
-			flipBrick(curX, curY);
+			gonnaFlip.push([curX, curY]);
 			curX += xInc;
 			curY += yInc;
 		}
+	}
+	for (i in gonnaFlip) {
+		flipBrick(gonnaFlip[i][0], gonnaFlip[i][1]);
 	}
 	return f;
 }
@@ -371,7 +382,7 @@ function validateMove(color, x, y) {
 }
 
 function placeBrick(color, xPos, yPos) {
-	if (!color || !xPos || !yPos) {
+	if (!color || xPos === false || yPos === false) {
 		alert('ERROR: Function placeBrick requires that parameters color, xPos, and yPos be specified.');
 		return;
 	}
