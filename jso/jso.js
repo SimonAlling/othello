@@ -15,8 +15,6 @@ jso.holding = 0; // indicates whether or not a brick is being held
 jso.turn = 'white'; // whose turn it is (initial value is opposite to first turn)
 jso.confirmBlackVis = 0;
 jso.confirmWhiteVis = 0;
-jso.gonnaFlipAll = [];
-jso.autoPassed = 0; // how many times in a row any player has been forced to pass
 jso.confirmOffsetTop = 51; // white confirm buttons actual offsetTop
 jso.board = [];
 for (x = 0; x < jso.bWidth; x++) {
@@ -29,11 +27,6 @@ for (x = 0; x < jso.bWidth; x++) {
 	}
 }
 jso.ctx = 0; // stores context of board canvas
-jso.redSquare = {
-	'present' : false,
-	'x' : 0,
-	'y' : 0
-};
 
 jso.move = {
 	x : 0,
@@ -143,10 +136,10 @@ function prepareGame() {
 			removeBrick('white');
 			removeBrick('black');
 		}
-		drawBrick('black', 3, 3);
-		drawBrick('white', 4, 3);
-		drawBrick('white', 3, 4);
-		drawBrick('black', 4, 4);
+		placeBrick('black', 3, 3);
+		placeBrick('white', 4, 3);
+		placeBrick('white', 3, 4);
+		placeBrick('black', 4, 4);
 		nextTurn();
 	}
 	else {
@@ -157,33 +150,7 @@ function prepareGame() {
 function setCanvasContexts() {
 	jso.white.ctx = n.white.getContext('2d');
 	jso.black.ctx = n.black.getContext('2d');
-	jso.white.brickctx = n.brickWhite.getContext('2d');
-	jso.black.brickctx = n.brickBlack.getContext('2d');
 	jso.ctx = n.can.getContext('2d');
-	
-	// Draw bricks on invisible canvases
-	var imgB = new Image();
-	imgB.onload = function() {
-		jso.black.brickctx.drawImage(imgB, 0, 0);
-	};
-	imgB.src = 'jso/pic/brick-black.png';
-	
-	var imgW = new Image();
-	imgW.onload = function() {
-		jso.white.brickctx.drawImage(imgW, 0, 0);
-	};
-	imgW.src = 'jso/pic/brick-white.png';
-	
-	// "Unavailable" icon
-	try {
-	
-	var imgU = new Image();
-	imgU.onload = function() {
-		n.un.getContext('2d').drawImage(imgU, 264, 30, 88, 88, 0, 0, 88, 88);
-	};
-	imgU.src = 'jso/pic/sprites.png';
-	
-	} catch(e) {alert('setcc | ' + e);}
 }
 
 function def(input, value) {
@@ -225,40 +192,19 @@ function touching(event, box) {
 	return false;
 }
 
-function canPlay(c) {
-
-	var myReturn = false;
-	for (x in jso.board) {
-		for (y in jso.board[x]) {
-			if (validateMove(c, x, y) === true) {
-				myReturn = true;
-				break;
-			}
-		}
-	}
-	return myReturn;
-}
-
 function nextTurn() {
 	if (jso.holding === 0) {
 		if (jso.turn == 'black') {
 			// change to WHITE
 			jso.turn = 'white';
+			hideConfirm();
 		}
 		else {
 			// change to BLACK
 			jso.turn = 'black';
+			hideConfirm();
 		}
-		hideConfirm();
 		resetHeld(jso.turn);
-		if (canPlay(jso.turn) === true) {
-			jso.autoPassed = 0;
-	alert(jso.turn + ' can play.');
-		}
-		else {
-			jso.autoPassed++;
-			nextTurn();
-		}
 	}
 }
 
@@ -310,9 +256,6 @@ function resetHeld(color) {
 
 function seize(event, color) {
 	if (jso.holding === 0) {
-		if (jso.redSquare.present === true) {
-			unred(jso.redSquare.x, jso.redSquare.y);
-		}
 		removeBrick(color);
 		if (jso.turn == 'black') {
 			n.held.src = 'jso/pic/brick-black-held.png';
@@ -344,6 +287,7 @@ function drop(event) {
 			var x = pixToSq(jso.move.x);
 			var y = pixToSq(jso.move.y-128);
 			placeBrick(jso.turn, x, y);
+			confirmMove();
 		}
 		else {
 			n.held.style.display = 'none';
@@ -382,7 +326,7 @@ function flipBrick(x, y) {
 		c = 'black';
 	}
 	clearSq(x, y);
-	drawBrick(c, x, y);
+	placeBrick(c, x, y);
 }
 
 function flips(c, xStart, yStart, xInc, yInc) {
@@ -390,39 +334,30 @@ function flips(c, xStart, yStart, xInc, yInc) {
 	var hasPassedOwn = false;
 	var oc = 'white'; // opponent's color
 	if (c === 'white') oc = 'black';
-	var curX = xStart;
-	var curY = yStart;
-	var gonnaFlip = [];
-	while (curX > -1 && curX < jso.bWidth+1 && curY > -1 && curY < jso.bHeight+1) {
+	var curX = xStart+xInc;
+	var curY = yStart+yInc;
+	while (curX >= 0 && curX < jso.bWidth && curY > 0 && curY < jso.bHeight) {
+		if (jso.board[curX][curY].state === 0) {
+			f = 0;
+			break;
+		}
+		else if (jso.board[curX][curY].color === c) {
+			break;
+		}
+		else {
+			f++;
+			flipBrick(curX, curY);
 			curX += xInc;
 			curY += yInc;
-	
-		if ((curX >= jso.bHeight || curY >= jso.bHeight || curX <= -1 || curY <= -1)) {
-			f = 0;
-			gonnaFlip = [];
-			break;
-		}
-		else if (jso.board[curX][curY].state === 1 && jso.board[curX][curY].color === c) {
-			break;
-		}
-		else if ((jso.board[curX][curY].state === 0)) {
-			f = 0;
-			gonnaFlip = [];
-			break;
-		}
-		else if (jso.board[curX][curY].state === 1 && jso.board[curX][curY].color === oc) {
-			f++;
-			gonnaFlip.push([curX, curY]);
 		}
 	}
-	jso.gonnaFlipAll = jso.gonnaFlipAll.concat(gonnaFlip);
 	return f;
 }
 
 function validateMove(color, x, y) {
 	var myReturn = false;
 	var numFlipped = 0;
-	jso.gonnaFlipAll = [];
+	//numFlipped += flips(color, x, y, 0, -1);
 	numFlipped += (flips(color, x, y, 0, -1));
 	numFlipped += (flips(color, x, y, 1, -1));
 	numFlipped += (flips(color, x, y, 1, 0));
@@ -431,53 +366,28 @@ function validateMove(color, x, y) {
 	numFlipped += (flips(color, x, y, -1, 1));
 	numFlipped += (flips(color, x, y, -1, 0));
 	numFlipped += (flips(color, x, y, -1, -1));
-	if (jso.board[x][y].state === 0 && numFlipped > 0) { myReturn = true; }
+	if (numFlipped > 0) { myReturn = true; }
 	return myReturn;
 }
 
-function drawBrick(color, xPos, yPos) {
-		jso.board[xPos][yPos].state = 1;
-		jso.board[xPos][yPos].color = color;
-		var xCoord = sqToPix(xPos);
-		var yCoord = sqToPix(yPos);
-		if (color === 'black') {
-			jso.ctx.drawImage(n.brickBlack, xCoord, yCoord);
-		}
-		else {
-			jso.ctx.drawImage(n.brickWhite, xCoord, yCoord);
-		}
-}
-
-function red(x, y) {
-	// make square (x, y) red if placing a brick there is not allowed
-	jso.redSquare.present = true; // tell engine that red square exists
-	jso.redSquare.x = x; // coords of red square
-	jso.redSquare.y = y;
-	jso.ctx.fillStyle = 'rgba(200,0,0,0.3)'; // gonna use semi-transparent red to fill the square
-	var fillX = sqToPix(x); // pixel coords of square
-	var fillY = sqToPix(y);
-//	jso.ctx.fillRect(fillX, fillY, jso.sqSize, jso.sqSize); // fill square with red
-	jso.ctx.drawImage(n.un, fillX, fillY); // draw "Unavailable" icon on square
-}
-
-function unred(x, y) {
-	// clear red square and make it non-red
-	jso.redSquare.present = false;
-	clearSq(x, y);
-}
-
 function placeBrick(color, xPos, yPos) {
-	if (!color || xPos === undefined || yPos === undefined) {
+	if (!color || !xPos || !yPos) {
 		alert('ERROR: Function placeBrick requires that parameters color, xPos, and yPos be specified.');
 		return;
 	}
-	if (validateMove(color, xPos, yPos)) {
-		drawBrick(color, xPos, yPos);
-		confirmMove();
+	jso.board[xPos][yPos].state = 1;
+	jso.board[xPos][yPos].color = color;
+	var xCoord = sqToPix(xPos);
+	var yCoord = sqToPix(yPos);
+	var img = new Image();
+	img.onload = function() {
+		jso.ctx.drawImage(img, xCoord, yCoord);
+	}
+	if (color === 'black') {
+		img.src = 'jso/pic/brick-black.png';
 	}
 	else {
-		cancelMove();
-		red(xPos, yPos);
+		img.src = 'jso/pic/brick-white.png';
 	}
 }
 
@@ -495,13 +405,19 @@ function cancelMove() {
 	addBrick(jso.turn);
 	resetHeld(jso.turn);
 	clearSq(x, y);
+	hideConfirm();
 }
 
 function confirm() {
-	for (i in jso.gonnaFlipAll) {
-		flipBrick(jso.gonnaFlipAll[i][0], jso.gonnaFlipAll[i][1]);
+	var c = jso.turn;
+	var x = pixToSq(jso.move.x);
+	var y = pixToSq(jso.move.y-128);
+	if (validateMove(c, x, y)) {
+		nextTurn();
 	}
-	nextTurn();
+	else {
+		cancelMove();
+	}
 }
 
 function assignListeners() {
@@ -517,7 +433,6 @@ function assignListeners() {
 			(768 - findPos(n.confirmWhiteNo)[0]),
 			(jso.confirmOffsetTop+n.confirmWhiteNo.offsetHeight-1)
 		)) {
-			hideConfirm();
 			cancelMove();
 		}
 	}, false);
@@ -534,7 +449,6 @@ function assignListeners() {
 	}, false);
 	n.confirmBlackNo.addEventListener('touchend', function() {
 		if (jso.confirmBlackVis === 1 && touching(event, n.confirmBlackNo)) {
-			hideConfirm();
 			cancelMove();
 		}
 	}, false);
