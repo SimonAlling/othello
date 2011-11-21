@@ -16,7 +16,7 @@ article, aside, figure, footer, header, hgroup, nav, section {display: block;}
 
 body {
 	background-color: black;
-	font-family: arial, sans-serif;
+	font-family: helvetica, arial, sans-serif;
 	height: 1024px;
 	width: 768px;
 }
@@ -92,6 +92,8 @@ body {
 #black {
 	display: block;
 	margin-top: 16px;
+position: absolute;
+	z-index: 10;
 }
 
 #menuWrapper {
@@ -121,10 +123,15 @@ body {
 
 #confirmOverlay {
 	height: 1024px;
-	margin-top: -1024px;
-	position: relative;
+	left: 0px;
+	position: absolute;
+	top: 0px;
 	width: 768px;
-	z-index: 700;
+	z-index: 2300;
+}
+
+#confirmOverlay * {
+	z-index: 2300;
 }
 
 #confirmWhiteWrapper, #confirmBlackWrapper {
@@ -132,12 +139,7 @@ body {
 }
 
 .confirmWrapper {
-	background: -moz-linear-gradient(top,  #b2b2b2 0%, #f4f4f4 50%, #b2b2b2 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b2b2b2), color-stop(50%,#f4f4f4), color-stop(100%,#b2b2b2)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* IE10+ */
-	background: linear-gradient(top,  #b2b2b2 0%,#f4f4f4 50%,#b2b2b2 100%); /* W3C */
+	background-color: rgb(245,245,245);
 	border: 1px black solid;
 	border-radius: 12px;
 	-webkit-border-radius: 12px;
@@ -146,7 +148,7 @@ body {
 	position: relative;
 	top: 140px;
 	transition: top 0.2s;
-	-moz-transition: top 0.2s;
+	-webkit-transform: none;
 	-webkit-transition: top 0.2s;
 	width: 576px;
 }
@@ -186,12 +188,52 @@ body {
 	margin-top: -1024px;
 	position: relative;
 	width: 768px;
-	z-index: 900;
+	z-index: 1200;
+}
+
+.turnOverlayPlayer {
+	background-color: rgba(0,0,0,0.9);
+	color: white;
+	height: 128px;
+	position: absolute;
+	width: 768px;
+}
+
+.turnOverlayPlayer p {
+	font-size: 64px;
+	font-weight: bold;
+	height: 108px;
+	padding-top: 20px;
+	text-align: center;
+}
+
+#turnOverlayWhite {
+	left: 0px;
+	top: 0px;
+}
+
+#turnOverlayBlack {
+	left: 0px;
+	top: 896px;
 }
 
 #held {
-	display: none;
 	left: 0px;
 	position: absolute;
 	top: 0px;
+	z-index: 1900;
+}
+
+#invisible {
+	display: none;
+	position: fixed; top: 10px; left: 10px;
+}
+
+#debug {
+	position: absolute;
+	top: 900px;
+	left: 2px;
+	background-color: white;
+	width: 92px;
+	height: 112px;
 }

@@ -51,6 +51,9 @@
 			</div>
 		</div>
 	</div>
+	<div id="overlay">
+		<canvas id="held" width="576" height="88"></canvas>
+	</div>
 	<div id="confirmOverlay">
 		<div id="confirmWhiteWrapper" class="flip">
 			<div id="confirmWWhite" class="confirmWrapper">
@@ -74,8 +77,12 @@
 			</div>
 		</div>
 	</div>
-	<div id="overlay">
-		<img id="held" src="jso/pic/tp.png" width="576" height="88" />
+	<!-- "It's X's turn" -->
+	<div id="turnOverlayWhite" class="turnOverlayPlayer">
+		<p class="flip">It's Black's turn.</p>
+	</div>
+	<div id="turnOverlayBlack" class="turnOverlayPlayer">
+		<p>It's White's turn.</p>
 	</div>
 	<div id="menuWrapper">
 		<div id="menuWhite">
@@ -88,6 +95,16 @@
 		
 		</div>
 	</div>
+</div>
+<div id="invisible">
+	<canvas id="brickWhite" width="88" height="88"></canvas>
+	<canvas id="brickBlack" width="88" height="88"></canvas>
+	<canvas id="brickWhiteHeld" width="104" height="104"></canvas>
+	<canvas id="brickBlackHeld" width="104" height="104"></canvas>
+	<canvas id="un" width="88" height="88"></canvas>
+</div>
+<div id="debug">
+
 </div>
 
 </body>
