@@ -126,7 +126,7 @@ function fillHolders() {
 	}
 }
 
-function prepareGame() {
+function doPrepare() {
 	if (jso.black.bricks == jso.bricksTotal/2) {
 		clearTimeout(jso.prep);
 		n.held.style.display = 'inline-block';
@@ -138,11 +138,18 @@ function prepareGame() {
 		drawBrick('white', 4, 3);
 		drawBrick('white', 3, 4);
 		drawBrick('black', 4, 4);
+		n.turnOverlayWhite.style.display = 'block';
+		n.turnOverlayBlack.style.display = 'block';
 		nextTurn();
 	}
 	else {
-		jso.prep = setTimeout("prepareGame()", 200);
+		jso.prep = setTimeout("doPrepare()", 300);
 	}
+}
+
+function prepareGame() {
+	setTimeout("fillHolders();", 100);
+	doPrepare();
 }
 
 function setCanvasContexts() {
@@ -580,7 +587,6 @@ function load() {
 	n = getElementsWithId(); // all elements with ID
 	assignListeners();
 	setCanvasContexts();
-	setTimeout("fillHolders();", 400);
 	prepareGame();
 }
 

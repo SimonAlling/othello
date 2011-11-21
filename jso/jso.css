@@ -97,28 +97,26 @@ position: absolute;
 }
 
 #menuWrapper {
-	background-color: rgba(255,0,0,0.5);
-	display: none;
+	background-color: rgb(0,0,0);
+	display: block;
 	height: 1024px;
 	margin-top: -1024px;
 	position: relative;
 	width: 768px;
-	z-index: 999;
+	z-index: 3000;
 }
 
-#menuWhite {
-	height: 128px;
-	width: 768px;
-}
-
-#menuBoard {
-	height: 768px;
-	width: 768px;
-}
-
-#menuBlack {
-	height: 128px;
-	width: 768px;
+#splash {
+	height: 512px;
+	left: 128px;
+	position: absolute;
+	top: 256px;
+	width: 512px;
+	-webkit-transform: none;
+	-webkit-transition: top 0.4s;
+	-webkit-transition: left 0.4s;
+	-webkit-transition: width 0.4s;
+	-webkit-transition: height 0.4s;
 }
 
 #confirmOverlay {
@@ -194,6 +192,7 @@ position: absolute;
 .turnOverlayPlayer {
 	background-color: rgba(0,0,0,0.9);
 	color: white;
+	display: none;
 	height: 128px;
 	position: absolute;
 	width: 768px;
