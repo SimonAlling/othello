@@ -40,6 +40,7 @@ jso.black = {
 	bricksTotal : 32,
 	ctx : 0
 };
+jso.playing = false;
 
 var isEventSupported = (function(){
 	var TAGNAMES = {
@@ -531,8 +532,16 @@ function confirm() {
 	nextTurn();
 }
 
+function newGame() {
+	if ((jso.playing === false) || (jso.playing === true && confirm('All current game progress will be lost if you start a new game. Are you sure?'))) {
+		hideMenu();
+		prepareGame();
+	}
+}
+
 function assignListeners() {
 	var buttons = document.getElementsByClassName('button');
+	n.menuNew.addEventListener('touchend', function() { newGame(); }, false);
 	n.held.addEventListener('touchstart', function() { seize(event, jso.turn); }, false);
 	n.held.addEventListener('touchmove', function() { move(event); }, false);
 	n.held.addEventListener('touchend', function() { drop(event); }, false);
@@ -572,6 +581,29 @@ function assignListeners() {
 	}, false);
 }
 
+function hideMenu() {
+	var t = setTimeout(function() {
+		n.menuWrapper.style.display = 'none';
+		n.menuWrapper.style.zIndex = '-3000';
+		n.menuResume.style.display = 'none';
+		n.menuResume.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
+		n.menuNew.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
+		n.menuSettings.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
+	}, 100);
+}
+
+function prepareMenu() {
+	n.menuWrapper.style.display = 'block';
+	n.menuWrapper.style.zIndex = '3000';
+	if (jso.playing === true) {
+		n.menuResume.style.display = 'block';
+	}
+	n.splashWrapper.style.WebkitTransform = 'translate3d(128px, 64px, 0)';
+	n.menuResume.style.WebkitTransform = 'translate3d(0, 0, 0)';
+	n.menuNew.style.WebkitTransform = 'translate3d(0, 0, 0)';
+	n.menuSettings.style.WebkitTransform = 'translate3d(0, 0, 0)';
+}
+
 function load() {
 	// runs on page load
 	for (x = 0; x < jso.bWidth; x++) {
@@ -587,7 +619,7 @@ function load() {
 	n = getElementsWithId(); // all elements with ID
 	assignListeners();
 	setCanvasContexts();
-	prepareGame();
+	prepareMenu();
 }
 
 function BlockMove(event) {

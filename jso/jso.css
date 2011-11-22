@@ -92,12 +92,21 @@ body {
 #black {
 	display: block;
 	margin-top: 16px;
-position: absolute;
+	position: absolute;
 	z-index: 10;
 }
 
+#loading {
+	background-color: rgba(255,0,0,0.3);
+	height: 1024px;
+	left: 0px;
+	position: fixed;
+	top: 0px;
+	width: 768px;
+}
+
 #menuWrapper {
-	background-color: rgb(0,0,0);
+	background-color: black;
 	display: block;
 	height: 1024px;
 	margin-top: -1024px;
@@ -106,17 +115,33 @@ position: absolute;
 	z-index: 3000;
 }
 
-#splash {
-	height: 512px;
-	left: 128px;
-	position: absolute;
-	top: 256px;
-	width: 512px;
-	-webkit-transform: none;
-	-webkit-transition: top 0.4s;
-	-webkit-transition: left 0.4s;
-	-webkit-transition: width 0.4s;
-	-webkit-transition: height 0.4s;
+#splashWrapper {
+	margin-bottom: 96px;
+	-webkit-transform: translate3d(128px, 256px, 0);
+	-webkit-transition: -webkit-transform 0.8s ease-in-out;
+}
+
+#menuWrapper .menuItem {
+	display: block;
+	margin: 20px auto 0 auto;
+	text-align: center;
+	width: 384px;
+	-webkit-transform: translate3d(-600px, 0px, 0);
+	-webkit-transition: -webkit-transform 0.5s ease-out;
+}
+
+#menuWrapper #menuNew {
+	-webkit-transition-delay: 1s;
+}
+
+#menuWrapper #menuSettings {
+	-webkit-transition-delay: 1.2s;
+}
+
+#menuWrapper #menuResume {
+	display: none;
+	margin-top: 64px;
+	-webkit-transition-delay: 1.4s;
 }
 
 #confirmOverlay {
@@ -235,4 +260,27 @@ position: absolute;
 	background-color: white;
 	width: 92px;
 	height: 112px;
+}
+
+
+
+.button {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+	line-height: 3em;
+	border: 3px solid #282726;
+	background: -webkit-gradient( linear, left top, left bottom, from(#e2e2e2), to(#8c8a88), color-stop(0.5, #acadae), color-stop(0.5, #82807e) );
+	margin: 0 0 3px 0;
+	padding:
+	text-shadow: 0px 1px 0 #cecece;
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: border-box;
+	-webkit-border-radius: 8px;
+}
+
+.button:active {
+	color: #fff;
+	text-shadow: none;
+	background: -webkit-gradient( linear, left top, left bottom, from(#aaaee5), to(#10006d), color-stop(0.5, #1F3B97), color-stop(0.5, #081f6f) );
 }
