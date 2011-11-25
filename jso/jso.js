@@ -1,4 +1,6 @@
-// Demotivational Poster Creator by Simon Alling
+// JS Othello by Simon Alling
+// HTML5, CSS3 and JavaScript only.
+// Works with iPad with iOS 3.2 and later.
 
 var jso = {}; // top object
 var n = {}; // storing all elements that have an ID attribute
@@ -11,6 +13,7 @@ jso.borderWidth = 8; // width of border between squares
 jso.bricksTotal = 64; // total number of bricks
 jso.fillCount = 0;
 jso.prep = 0; // to loop prepareGame
+jso.loadingDir = 0; // current rotation of loadingImg
 jso.holding = 0; // indicates whether or not a brick is being held
 jso.turn = 'white'; // whose turn it is (initial value is opposite to first turn)
 jso.confirmBlackVis = 0;
@@ -19,6 +22,15 @@ jso.gonnaFlipAll = [];
 jso.autoPassed = 0; // how many times in a row any player has been forced to pass
 jso.confirmOffsetTop = 51; // white confirm buttons actual offsetTop
 jso.board = [];
+for (x = 0; x < jso.bWidth; x++) {
+	jso.board[x] = [];
+	for (y = 0; y < jso.bHeight; y++) {
+		jso.board[x][y] = {
+			state : 0,
+			color : 0
+		};
+	}
+}
 jso.ctx = 0; // stores context of board canvas
 jso.redSquare = {
 	'present' : false,
@@ -33,14 +45,29 @@ jso.move = {
 jso.white = {
 	bricks : 0,
 	bricksTotal : 32,
+	bricksFinal : 0,
 	ctx : 0
 };
 jso.black = {
 	bricks : 0,
 	bricksTotal : 32,
+	bricksFinal : 0,
 	ctx : 0
 };
 jso.playing = false;
+
+function opp(color) {
+	if (color === 'black') {
+		return 'white';
+	}
+	else if (color === 'white') {
+		return 'black';
+	}
+	else {
+		alert('ERROR: Function opp requires that either "black" or "white" be passed to it.');
+		return false;
+	}
+}
 
 var isEventSupported = (function(){
 	var TAGNAMES = {
@@ -87,18 +114,14 @@ function isJsonString(str) {
 }
 
 function getElementsWithId() {
-	// returns an object with all elements that have an ID attribute
-	// the result is returned like so:
-	// myReturn['foo'] = document.getElementById('foo');
-	// myReturn['bar'] = document.getElementById('bar');
-	var myReturn = {};
+	var elementsWithId = {};
 	var allElements = document.getElementsByTagName('*'); // get all elements in the document
 	for (i = 0; i < allElements.length; i++) {
-		if ((allElements[i]).getAttribute('id')) { // test if the current element has an ID
-			myReturn[(allElements[i]).getAttribute('id')] = allElements[i]; // if so, add the element to the returned object
+		if ((allElements[i]).getAttribute('id')) { // test if the current element has an ID...
+			elementsWithId[(allElements[i]).getAttribute('id')] = allElements[i]; // ... and if it does, add the element to returnedElements
 		}
 	}
-	return myReturn;
+	return elementsWithId;
 }
 
 function addBrick(color) {
@@ -127,6 +150,21 @@ function fillHolders() {
 	}
 }
 
+function rotateLoading() {
+	jso.loadingDir++;
+	if (jso.loadingDir == 3600) {
+		jso.loadingDir = 0; // ensure that it doesn't reach extreme values
+	}
+	var newRot = jso.loadingDir * 90;
+	n.loadingImg.style.WebkitTransform = 'rotate('+ newRot +'deg)';
+	var timer = setTimeout('rotateLoading()', 250);
+}
+
+function hideLoading() {
+	n.loading.style.opacity = '0';
+	setTimeout(function() { n.loading.style.display = 'none'; }, 500)
+}
+
 function doPrepare() {
 	if (jso.black.bricks == jso.bricksTotal/2) {
 		clearTimeout(jso.prep);
@@ -139,17 +177,20 @@ function doPrepare() {
 		drawBrick('white', 4, 3);
 		drawBrick('white', 3, 4);
 		drawBrick('black', 4, 4);
+		setTimeout(function() { n.can.style.opacity = '1'; }, 200);
 		n.turnOverlayWhite.style.display = 'block';
 		n.turnOverlayBlack.style.display = 'block';
+		setTimeout('hideLoading()', 200);
 		nextTurn();
 	}
 	else {
-		jso.prep = setTimeout("doPrepare()", 300);
+		jso.prep = setTimeout("doPrepare()", 200);
 	}
 }
 
 function prepareGame() {
-	setTimeout("fillHolders();", 100);
+	rotateLoading();
+	setTimeout("fillHolders();", 600);
 	doPrepare();
 }
 
@@ -241,6 +282,61 @@ function touching(event, box) {
 	return false;
 }
 
+function stopGame() {
+	try {
+	jso.black.bricksFinal = 0;
+	jso.white.bricksFinal = 0;
+	// Loop through board and sum bricks up
+	for (x in jso.board) {
+		for (y in jso.board[x]) {
+			if (jso.board[x][y].state === 1) {
+				jso[(jso.board[x][y].color)].bricksFinal++; // Increase corresponding bricksFinal
+			}
+		}
+	}
+	var msgWhite = '';
+	var msgBlack = '';
+	if (jso.black.bricksFinal > jso.white.bricksFinal) {
+		msgWhite = 'You lost with ' + jso.white.bricksFinal + ' against ' + jso.black.bricksFinal + '.';
+		msgBlack = 'You won with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
+	}
+	else if (jso.white.bricksFinal > jso.black.bricksFinal) {
+		msgWhite = 'You won with ' + jso.white.bricksFinal + 'against ' + jso.black.bricksFinal + '.';
+		msgBlack = 'You lost with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
+	}
+	else {
+		msgWhite = msgBlack = 'Tie: Both players have ' + jso.black.bricksFinal + ' bricks on the board.';
+	}
+	setTimeout(function() {
+		n.turnOverlayWhiteText.innerHTML = msgWhite;
+		n.turnOverlayWhite.style.zIndex = '1100';
+		n.turnOverlayWhite.style.opacity = '1';
+		n.turnOverlayBlackText.innerHTML = msgBlack;
+		n.turnOverlayBlack.style.zIndex = '1100';
+		n.turnOverlayBlack.style.opacity = '1';
+	}, 100);
+	
+	
+	} catch(e) {alert(e);}
+}
+
+function passTurn(color) {
+	if (canPlay(opp(color)) === false || (jso.black.bricks === 0 && jso.white.bricks === 0)) {
+		stopGame();
+	}
+	else {
+		if (color === 'black') {
+			n.turnOverlayBlackText.innerHTML = 'No possible move.';
+		}
+		else {
+			n.turnOverlayWhiteText.innerHTML = 'No possible move.';
+		}
+		setTimeout(function() {
+			nextTurn();
+		}, 1500);
+	}
+}
+
 function canPlay(c) {
 	var myReturn = false;
 	for (x = 0; x < jso.board.length; x++) {
@@ -258,33 +354,54 @@ function nextTurn() {
 try {
 
 
+	n.turnOverlayBlackText.innerHTML = "It's White's turn.";
+	n.turnOverlayWhiteText.innerHTML = "It's Black's turn.";
 	if (jso.holding === 0) {
 		var prevTurn = jso.turn;
-		if (jso.turn == 'black') {
-			// change to WHITE
-			jso.turn = 'white';
-			n.turnOverlayBlack.style.zIndex = '1100';
-			n.turnOverlayWhite.style.zIndex = '-100';
-		}
-		else {
-			// change to BLACK
-			jso.turn = 'black';
-			n.turnOverlayWhite.style.zIndex = '1100';
-			n.turnOverlayBlack.style.zIndex = '-100';
-		}
+			if (jso.turn == 'black') {
+				// change to WHITE
+				jso.turn = 'white';
+				setTimeout(function() {
+					n.turnOverlayBlack.style.zIndex = '1100';
+					n.turnOverlayBlack.style.opacity = '1';
+				}, 100);	
+			}
+			else {
+				// change to BLACK
+				jso.turn = 'black';
+				setTimeout(function() {
+					n.turnOverlayWhite.style.zIndex = '1100';
+					n.turnOverlayWhite.style.opacity = '1';
+				}, 100);
+			}
 		hideConfirm();
 		resetHeld(jso.turn);
 		if (canPlay(jso.turn) === true) {
 		//	alert(jso.turn + ' can play.');
+			if (jso[jso.turn].bricks === 0) {
+				removeBrick(prevTurn);
+				addBrick(jso.turn);
+			}
 			jso.autoPassed = 0;
+			if (jso.turn == 'white') {
+				n.turnOverlayWhite.style.opacity = '0';
+				setTimeout(function() {
+					n.turnOverlayWhite.style.zIndex = '-100';
+				}, 300);
+			}
+			else {
+				n.turnOverlayBlack.style.opacity = '0';
+				setTimeout(function() {
+					n.turnOverlayBlack.style.zIndex = '-100';
+				}, 300);
+			}
 		}
 		else {
+		//	debug('print', jso.turn + ' can NOT play.<br />' + jso.autoPassed); // REMOVE
+		//	alert(jso.turn + ' can NOT play.');
 			jso.autoPassed++;
-			removeBrick(jso.turn);
-			removeBrick(prevTurn);
-			nextTurn();
+			passTurn(jso.turn);
 		}
-		debug('print', jso.autoPassed);
 	}
 	
 	} catch(e) { alert(e); }
@@ -293,8 +410,8 @@ try {
 function hideConfirm() {
 	jso.confirmWhiteVis = 0;
 	jso.confirmBlackVis = 0;
-	n.confirmWWhite.style.top = '140px';
-	n.confirmWBlack.style.top = '140px';
+	n.confirmWWhite.style.WebkitTransform = 'translate3d(0, 140px, 0)';
+	n.confirmWBlack.style.WebkitTransform = 'translate3d(0, 140px, 0)';
 	n.confirmOverlay.style.zIndex = '700';
 }
 
@@ -302,11 +419,11 @@ function confirmMove() {
 	n.confirmOverlay.style.zIndex = '2300';
 	if (jso.turn === 'black') {
 		jso.confirmBlackVis = 1;
-		n.confirmWBlack.style.top = '4px';
+		n.confirmWBlack.style.WebkitTransform = 'translate3d(0, 4px, 0)';
 	}
 	else {
 		jso.confirmWhiteVis = 1;
-		n.confirmWWhite.style.top = '4px';
+		n.confirmWWhite.style.WebkitTransform = 'translate3d(0, 4px, 0)';
 	}
 }
 
@@ -495,6 +612,7 @@ function unred(x, y) {
 }
 
 function placeBrick(color, xPos, yPos) {
+try {
 	if (!color || xPos === undefined || yPos === undefined) {
 		alert('ERROR: Function placeBrick requires that parameters color, xPos, and yPos be specified.');
 		return;
@@ -507,6 +625,8 @@ function placeBrick(color, xPos, yPos) {
 		cancelMove();
 		red(xPos, yPos);
 	}
+	
+} catch(e) {alert(e);}
 }
 
 function clearSq(x, y) {
@@ -540,8 +660,12 @@ function newGame() {
 }
 
 function assignListeners() {
-	var buttons = document.getElementsByClassName('button');
-	n.menuNew.addEventListener('touchend', function() { newGame(); }, false);
+	var buttons = document.getElementsByClassName('button'); // REMOVE
+	n.menuNew.addEventListener('touchend', function() {
+		if (touching(event, n.menuNew)) {
+			newGame();
+		}
+	}, false);
 	n.held.addEventListener('touchstart', function() { seize(event, jso.turn); }, false);
 	n.held.addEventListener('touchmove', function() { move(event); }, false);
 	n.held.addEventListener('touchend', function() { drop(event); }, false);
@@ -583,12 +707,15 @@ function assignListeners() {
 
 function hideMenu() {
 	var t = setTimeout(function() {
+		n.menuWrapper.style.WebkitTransform = 'translate3d(768px, 0, 0)';
+	
+	/*
 		n.menuWrapper.style.display = 'none';
 		n.menuWrapper.style.zIndex = '-3000';
 		n.menuResume.style.display = 'none';
 		n.menuResume.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
 		n.menuNew.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
-		n.menuSettings.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
+		n.menuSettings.style.WebkitTransform = 'translate3d(-600px, 0, 0)';*/
 	}, 100);
 }
 
@@ -605,18 +732,9 @@ function prepareMenu() {
 }
 
 function load() {
-	// runs on page load
-	for (x = 0; x < jso.bWidth; x++) {
-		jso.board[x] = [];
-		for (y = 0; y < jso.bHeight; y++) {
-			jso.board[x][y] = {
-				state : 0,
-				color : 0
-			};
-		}
-	}
+	// Runs on page load.
 	checkComp();
-	n = getElementsWithId(); // all elements with ID
+	n = getElementsWithId(); // All elements with ID
 	assignListeners();
 	setCanvasContexts();
 	prepareMenu();
@@ -631,11 +749,11 @@ function BlockMove(event) {
 function debug(action, variable) {
 	switch(action) {
 		case 'print':
+			n.debug.style.backgroundColor = 'red';
 			n.debug.innerHTML = variable;
 			break;
 		default:
 			alert('ERROR: Debuggning action unknown.');
 			return false;
 	}
-}	
-
+}
