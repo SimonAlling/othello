@@ -21,6 +21,29 @@ body {
 	width: 768px;
 }
 
+.button {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+	line-height: 3em;
+	border: 3px solid #282726;
+	background: -webkit-gradient( linear, left top, left bottom, from(#e2e2e2), to(#8c8a88), color-stop(0.5, #acadae), color-stop(0.5, #82807e) );
+	margin: 0 0 3px 0;
+	text-align: center;
+	text-shadow: 0px 1px 0 #cecece;
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: padding-box;
+	-webkit-border-radius: 8px;
+}
+
+.button:active {
+	color: #fff;
+	text-shadow: none;
+	background: -webkit-gradient( linear, left top, left bottom, from(#aaaee5), to(#10006d), color-stop(0.5, #1F3B97), color-stop(0.5, #081f6f) );
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: padding-box;
+}
+
 #gameWrapper {
 	background-image: url('pic/background.png');
 	height: 1024px;
@@ -49,14 +72,15 @@ body {
 	width: 64px;
 }
 
-.btnOpenMenu {
-	background-image: url('pic/sprites.png');
-	background-position: 0 0;
-	height: 30px;
+.openMenu {
+	font-size: 1.2em;
+	height: 36px;
+	line-height: 1.9em;
 	width: 64px;
+	z-index: 13900;
 }
 
-.btnOpenMenu:active {
+.openMenu:active {
 	background-position: -64px 0;
 }
 
@@ -161,6 +185,8 @@ body {
 }
 
 #confirmOverlay {
+display: none;
+background-color: rgba(255,0,0,0.2);
 	height: 1024px;
 	left: 0px;
 	position: absolute;
@@ -256,6 +282,25 @@ body {
 	top: 896px;
 }
 
+.buttonArea {
+	height: 128px;
+	left: 0px;
+	position: absolute;
+	width: 768px;
+}
+
+.buttonArea .sideBox:first-child {
+	margin-right: 576px;
+}
+
+#buttonAreaWhite {
+	top: 0px;
+}
+
+#buttonAreaBlack {
+	top: 896px;
+}
+
 #held {
 	left: 0px;
 	position: absolute;
@@ -278,28 +323,3 @@ body {
 	height: 112px;
 	z-index: 6000;
 } /* REMOVE */
-
-
-
-.button {
-	font-family: "Helvetica Neue", Helvetica, sans-serif;
-	font-size: 1.5em;
-	font-weight: bold;
-	line-height: 3em;
-	border: 3px solid #282726;
-	background: -webkit-gradient( linear, left top, left bottom, from(#e2e2e2), to(#8c8a88), color-stop(0.5, #acadae), color-stop(0.5, #82807e) );
-	margin: 0 0 3px 0;
-	padding:
-	text-shadow: 0px 1px 0 #cecece;
-	-webkit-background-origin: padding-box;
-	-webkit-background-clip: padding-box;
-	-webkit-border-radius: 8px;
-}
-
-.button:active {
-	color: #fff;
-	text-shadow: none;
-	background: -webkit-gradient( linear, left top, left bottom, from(#aaaee5), to(#10006d), color-stop(0.5, #1F3B97), color-stop(0.5, #081f6f) );
-	-webkit-background-origin: padding-box;
-	-webkit-background-clip: padding-box;
-}
