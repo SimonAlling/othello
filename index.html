@@ -18,6 +18,19 @@
 <script src="jso/jso.js"></script>
 <script src="jso/json/json2.js"></script>
 
+<link rel="stylesheet" href="jso/add2home/add2home.css">
+<script type="text/javascript">
+var addToHomeConfig = {
+	animationIn: 'bubble',
+	animationOut: 'drop',
+	lifespan:120000,
+	expire:0.25,
+	touchIcon:false,
+	message:"JS Othello must be added to your Home Screen in order to work properly. Please tap %icon, then <strong>Add to Home Screen</strong>."
+};
+</script>
+<script type="text/javascript" src="jso/add2home/add2home.js?v1"></script>
+
 </head>
 
 <body ontouchmove="BlockMove(event);" onload="load();">
@@ -51,24 +64,6 @@
 	</div>
 	<div id="overlay">
 		<canvas id="held" width="1" height="1"></canvas>
-<!--		<div id="buttonAreaWhite" class="buttonArea flip">
-			<div class="sideBox">
-			</div>
-			<div class="sideBox">
-				<div class="sideBoxButtonWrapper">
-					<div class="openMenu button" id="openMenuWhite">Menu</div>
-				</div>
-			</div>
-		</div>
-		<div id="buttonAreaBlack" class="buttonArea">
-			<div class="sideBox"></div>
-			<div class="sideBox">
-				<div class="sideBoxButtonWrapper">
-					<div class="openMenu button" id="openMenuBlack">Menu</div>
-				</div>
-			</div>
-		</div>-->
-
 	</div>
 	<div id="confirmOverlay">
 		<div id="confirmWhiteWrapper" class="flip">
@@ -93,6 +88,8 @@
 			</div>
 		</div>
 	</div>
+	<div id="openMenuWhite" class="button btnOpenMenu flip">Main<br />Menu</div>
+	<div id="openMenuBlack" class="button btnOpenMenu">Main<br />Menu</div>
 	<!-- "It's X's turn" -->
 	<div id="turnOverlayWhite" class="turnOverlayPlayer">
 		<p id="turnOverlayWhiteText" class="flip">It's Black's turn.</p>
@@ -104,7 +101,7 @@
 <div id="loading">
 	<img id="loadingImg" src="jso/pic/loading.png" width="128" height="128" alt="Loading" />
 </div>
-<div id="menuWrapper">
+<div id="menuWrapper" class="slide">
 	<div id="splashWrapper">
 		<img src="jso/pic/splash.png" id="splash" alt="JS Othello" />
 	</div>
@@ -112,11 +109,50 @@
 	<div class="button menuItem" id="menuSettings">Settings</div>
 	<div class="button menuItem" id="menuResume">Resume Game</div>
 </div>
+<div id="settingsWrapper" class="slide">
+	<div id="settingsPadding">
+		<h2>Settings</h2>
+		<div id="settings" class="settingsCollection">
+			<div>
+				<input type="checkbox" id="settingsConfirm" />
+				<h3>Require confirmation</h3>
+				<p>
+				Prevents players from accidentally making unwanted moves.
+				</p>
+			</div>
+			<div>
+				<input type="checkbox" id="settingsAutosave" />
+				<h3>Autosave</h3>
+				<p>
+				Game is automatically saved and can be loaded at a later time.
+				</p>
+			</div>
+		</div>
+		<h2>Help</h2>
+		<div id="help" class="settingsCollection">
+			<h3>How to play Othello/Reversi</h3>
+			<p>
+			The goal is to have the majority of the pieces on the board showing your color at the end of the game. Trap your opponent's pieces between your own pieces to turn them over.
+			</p>
+			<p>
+			If you don't know how to play the game, please read <a href="https://en.wikipedia.org/wiki/Reversi">the Wikipedia article about Reversi</a>.
+			</p>
+			<h3>Controls</h3>
+			<p>
+			To place a piece on the board, use your finger to drag a piece from your holder. Upon dropping the piece on a valid position, you will need to confirm your move before proceeding (unless you have changed that setting).
+			</p>
+			<p>
+			If there is no possible move, the turn will automatically pass to your opponent. The game ends when neither of the players can move.
+			</p>
+		</div>
+		<div id="btnSettingsBack" class="button">Main Menu</div>
+	</div>
+</div>
 <div id="invisible">
-	<canvas id="pieceWhite" width="88" height="88"></canvas>
-	<canvas id="pieceBlack" width="88" height="88"></canvas>
-	<canvas id="pieceWhiteHeld" width="104" height="104"></canvas>
-	<canvas id="pieceBlackHeld" width="104" height="104"></canvas>
+	<canvas id="brickWhite" width="88" height="88"></canvas>
+	<canvas id="brickBlack" width="88" height="88"></canvas>
+	<canvas id="brickWhiteHeld" width="104" height="104"></canvas>
+	<canvas id="brickBlackHeld" width="104" height="104"></canvas>
 	<canvas id="un" width="88" height="88"></canvas>
 </div>
 <div id="debug">

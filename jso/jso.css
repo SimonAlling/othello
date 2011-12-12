@@ -18,35 +18,20 @@ body {
 	background-color: black;
 	font-family: helvetica, arial, sans-serif;
 	height: 1024px;
+	overflow: hidden;
 	width: 768px;
 }
 
-.button {
-	font-family: "Helvetica Neue", Helvetica, sans-serif;
-	font-size: 1.5em;
-	font-weight: bold;
-	line-height: 3em;
-	border: 3px solid #282726;
-	background: -webkit-gradient( linear, left top, left bottom, from(#e2e2e2), to(#8c8a88), color-stop(0.5, #acadae), color-stop(0.5, #82807e) );
-	margin: 0 0 3px 0;
-	text-align: center;
-	text-shadow: 0px 1px 0 #cecece;
-	-webkit-background-origin: padding-box;
-	-webkit-background-clip: padding-box;
-	-webkit-border-radius: 8px;
-}
-
-.button:active {
-	color: #fff;
-	text-shadow: none;
-	background: -webkit-gradient( linear, left top, left bottom, from(#aaaee5), to(#10006d), color-stop(0.5, #1F3B97), color-stop(0.5, #081f6f) );
-	-webkit-background-origin: padding-box;
-	-webkit-background-clip: padding-box;
+#wrapper {
+	height: 1024px;
+	overflow: hidden;
+	width: 768px;
 }
 
 #gameWrapper {
 	background-image: url('pic/background.png');
 	height: 1024px;
+	overflow: hidden;
 	width: 768px;
 	z-index: 2;
 }
@@ -67,21 +52,33 @@ body {
 	-webkit-transform: rotate(180deg);
 }
 
+.slide {
+	-webkit-transition: -webkit-transform 0.2s linear;
+}
+
 .sideBoxButtonWrapper {
 	margin: 16px 16px 0 16px;
 	width: 64px;
 }
 
-.openMenu {
-	font-size: 1.2em;
-	height: 36px;
-	line-height: 1.9em;
+#wrapper div.btnOpenMenu {
+	font-size: 18px;
+	height: 70px;
+	line-height: 1.5em;
+	padding: 12px 0 0 0;
+	position: absolute;
 	width: 64px;
-	z-index: 13900;
+	z-index: 2700;
 }
 
-.openMenu:active {
-	background-position: -64px 0;
+#openMenuWhite {
+	left: 13px;
+	top: 24px;
+}
+
+#openMenuBlack {
+	left: 685px;
+	top: 912px;
 }
 
 #whiteHolder {
@@ -126,7 +123,7 @@ body {
 	height: 1024px;
 	left: 0px;
 	opacity: 1;
-	position: fixed;
+	position: absolute;
 	top: 0px;
 	width: 768px;
 	z-index: 2800;
@@ -146,12 +143,13 @@ body {
 	background-color: black;
 	display: block;
 	height: 1024px;
-	margin-top: -1024px;
-	position: relative;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
 	width: 768px;
 	z-index: 3000;
 	-webkit-transform: translate3d(0, 0, 0);
-	-webkit-transition: -webkit-transform 0.3s linear;
 	/* When menu slides out/in */
 }
 
@@ -184,11 +182,86 @@ body {
 	-webkit-transition-delay: 1.6s;
 }
 
+#settingsWrapper {
+	background-color: rgb(230,230,230);
+	height: 1024px;
+	left: 768px;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	width: 768px;
+	-webkit-transform: translate3d(0, 0, 0);
+	z-index: 3000;
+}
+
+#settingsPadding {
+	padding: 0 64px 64px 64px;
+}
+
+#settingsWrapper h2 {
+	font-size: 24px;
+	margin: 48px 0 16px 0;
+	text-align: center;
+}
+
+.settingsCollection {
+	background-color: white;
+	border: 1px rgb(160,160,160) solid;
+	margin-bottom: 16px;
+	-webkit-border-radius: 8px;
+}
+
+#settings>div {
+	border-bottom: 1px rgb(192,192,192) solid;
+	line-height: 32px;
+	padding: 8px;
+}
+
+#settings>div:last-child {
+	border-bottom: none;
+}
+
+#settings input {
+	height: 32px;
+	vertical-align: top;
+	width: 32px;
+}
+
+#settings h3 {
+	display: inline-block;
+	font-size: 18px;
+	margin-left: 4px;
+	position: relative;
+	top: 3px;
+	vertical-align: top;
+}
+
+#settings p {
+	color: rgb(160,160,160);
+	margin: 0;
+}
+
+#help {
+	height: 512px;
+	line-height: 1.3em;
+	padding: 16px;
+	position: relative;
+	z-index: 1;
+}
+
+#help h3 {
+	font-size: 20px;
+	margin: 16px 0 12px 0;
+}
+
+#help p {
+	margin: 0 0 12px 0;
+}
+
 #confirmOverlay {
-display: none;
-background-color: rgba(255,0,0,0.2);
 	height: 1024px;
 	left: 0px;
+	overflow: hidden;
 	position: absolute;
 	top: 0px;
 	width: 768px;
@@ -247,8 +320,10 @@ background-color: rgba(255,0,0,0.2);
 
 #overlay {
 	height: 1024px;
-	margin-top: -1024px;
-	position: relative;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
 	width: 768px;
 	z-index: 1200;
 }
@@ -261,14 +336,14 @@ background-color: rgba(255,0,0,0.2);
 	opacity: 0;
 	position: absolute;
 	width: 768px;
-	-webkit-transition: opacity 200ms linear;
+	-webkit-transition: opacity 100ms linear;
 }
 
 .turnOverlayPlayer p {
 	font-size: 48px;
 	font-weight: bold;
-	height: 108px;
-	padding-top: 20px;
+	height: 68px;
+	padding: 30px 0 30px 0;
 	text-align: center;
 }
 
@@ -282,26 +357,9 @@ background-color: rgba(255,0,0,0.2);
 	top: 896px;
 }
 
-.buttonArea {
-	height: 128px;
-	left: 0px;
-	position: absolute;
-	width: 768px;
-}
-
-.buttonArea .sideBox:first-child {
-	margin-right: 576px;
-}
-
-#buttonAreaWhite {
-	top: 0px;
-}
-
-#buttonAreaBlack {
-	top: 896px;
-}
-
 #held {
+			outline: 3px red solid; /*REMOVE*/
+	background-color: rgba(255,0,0,0.4); /* REMOVE */
 	left: 0px;
 	position: absolute;
 	top: 0px;
@@ -310,7 +368,7 @@ background-color: rgba(255,0,0,0.2);
 
 #invisible {
 	display: none;
-	position: fixed; top: 10px; left: 10px;
+	position: absolute; top: 10px; left: 10px;
 }
 
 #debug {
@@ -323,3 +381,28 @@ background-color: rgba(255,0,0,0.2);
 	height: 112px;
 	z-index: 6000;
 } /* REMOVE */
+
+
+
+.button {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+	line-height: 3em;
+	border: 3px solid #282726;
+	background: -webkit-gradient( linear, left top, left bottom, from(#e2e2e2), to(#8c8a88), color-stop(0.5, #acadae), color-stop(0.5, #92908e) );
+	margin: 0 0 3px 0;
+	text-align: center;
+	text-shadow: 0px 1px 0 #cecece;
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: padding-box;
+	-webkit-border-radius: 8px;
+}
+
+.button:active {
+	color: #fff;
+	text-shadow: none;
+	background: -webkit-gradient( linear, left top, left bottom, from(#aaaee5), to(#10006d), color-stop(0.5, #1F3B97), color-stop(0.5, #081f6f) );
+	-webkit-background-origin: padding-box;
+	-webkit-background-clip: padding-box;
+}

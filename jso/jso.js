@@ -1,4 +1,3 @@
-
 // JS Othello by Simon Alling
 // HTML5, CSS3 and JavaScript only.
 // Works with iPad with iOS 3.2 and later.
@@ -8,14 +7,15 @@ var n = {}; // storing all elements that have an ID attribute
 jso.bWidth = 8; // board width in squares
 jso.bHeight = 8; // board height in squares
 jso.sqSize = 88; // size of one square
-jso.heldSize = 104; // size of the piece being held
-jso.thickness = 18; // piece thickness
+jso.heldSize = 104; // size of the brick being held
+jso.thickness = 18; // brick thickness
 jso.borderWidth = 8; // width of border between squares
-jso.piecesTotal = 64; // total number of pieces
+jso.bricksTotal = 64; // total number of bricks
 jso.fillCount = 0;
+jso.loadingDir = 0;
+jso.timerRotate = 0;
 jso.prep = 0; // to loop prepareGame
-jso.loadingDir = 0; // current rotation of loadingImg
-jso.holding = 0; // indicates whether or not a piece is being held
+jso.holding = 0; // indicates whether or not a brick is being held
 jso.turn = 'white'; // whose turn it is (initial value is opposite to first turn)
 jso.confirmBlackVis = 0;
 jso.confirmWhiteVis = 0;
@@ -44,18 +44,20 @@ jso.move = {
 	y : 0
 };
 jso.white = {
-	pieces : 0,
-	piecesTotal : 32,
-	piecesFinal : 0,
+	bricks : 0,
+	bricksTotal : 32,
+	bricksFinal : 0,
 	ctx : 0
 };
 jso.black = {
-	pieces : 0,
-	piecesTotal : 32,
-	piecesFinal : 0,
+	bricks : 0,
+	bricksTotal : 32,
+	bricksFinal : 0,
 	ctx : 0
 };
 jso.playing = false;
+jso.changesMade = false;
+
 
 function opp(color) {
 	if (color === 'black') {
@@ -125,28 +127,28 @@ function getElementsWithId() {
 	return elementsWithId;
 }
 
-function addPiece(color) {
-	var currentPieces = jso[color].pieces;
+function addBrick(color) {
+	var currentBricks = jso[color].bricks;
 	var img = new Image();
 	img.onload = function() {
-		jso[color].ctx.drawImage(img, currentPieces * jso.thickness, 0);
+		jso[color].ctx.drawImage(img, currentBricks * jso.thickness, 0);
 	};
-	img.src = 'jso/pic/piece-side.png';
-	jso[color].pieces++;
+	img.src = 'jso/pic/brick-side.png';
+	jso[color].bricks++;
 }
 
-function removePiece(color) {
-	var currentPieces = jso[color].pieces;
-	jso[color].ctx.clearRect((currentPieces * jso.thickness)-18, 0, 18, 88);
-	jso[color].pieces = jso[color].pieces - 1;
+function removeBrick(color) {
+	var currentBricks = jso[color].bricks;
+	jso[color].ctx.clearRect((currentBricks * jso.thickness)-18, 0, 18, 88);
+	jso[color].bricks = jso[color].bricks - 1;
 }
 
 function fillHolders() {
 	jso.fillCount++;
-	addPiece('white');
-	addPiece('black');
+	addBrick('white');
+	addBrick('black');
 	var t = setTimeout('fillHolders()', 20);
-	if (jso.fillCount === jso.white.piecesTotal) {
+	if (jso.fillCount === jso.white.bricksTotal-2) {
 		clearTimeout(t);
 	}
 }
@@ -158,7 +160,7 @@ function rotateLoading() {
 	}
 	var newRot = jso.loadingDir * 90;
 	n.loadingImg.style.WebkitTransform = 'rotate('+ newRot +'deg)';
-	var timer = setTimeout('rotateLoading()', 250);
+	jso.timerRotate = setTimeout('rotateLoading()', 250);
 }
 
 function hideLoading() {
@@ -167,30 +169,64 @@ function hideLoading() {
 }
 
 function doPrepare() {
-	if (jso.black.pieces == jso.piecesTotal/2) {
+	if (jso.black.bricks == (jso.bricksTotal/2)-2) {
 		clearTimeout(jso.prep);
 		n.held.style.display = 'inline-block';
-		for (i = 0; i < 2; i++) {
-			removePiece('white');
-			removePiece('black');
-		}
-		drawPiece('black', 3, 3);
-		drawPiece('white', 4, 3);
-		drawPiece('white', 3, 4);
-		drawPiece('black', 4, 4);
+		drawBrick('black', 3, 3);
+		drawBrick('white', 4, 3);
+		drawBrick('white', 3, 4);
+		drawBrick('black', 4, 4);
 		setTimeout(function() { n.can.style.opacity = '1'; }, 200);
 		n.turnOverlayWhite.style.display = 'block';
 		n.turnOverlayBlack.style.display = 'block';
-		setTimeout('hideLoading()', 500);
-		setTimeout('nextTurn()', 600);
+		setTimeout('hideLoading()', 400);
+		nextTurn();
 	}
 	else {
 		jso.prep = setTimeout("doPrepare()", 200);
 	}
 }
 
+function resetGame() {
+	jso.playing = true;
+	jso.changesMade = false;
+	hideConfirm();
+	n.turnOverlayWhite.style.display = 'none';
+	n.turnOverlayBlack.style.display = 'none';
+	n.menuResume.style.display = 'none';
+	jso.white.bricks = 0;
+	jso.black.bricks = 0;
+	jso.ctx.clearRect(0,0,768,768); // Clear board canvas
+	jso.white.ctx.clearRect(0,0,768,768); // Clear holder canvases
+	jso.black.ctx.clearRect(0,0,768,768);
+	jso.fillCount = 0;
+	jso.prep = 0; // to loop prepareGame
+	jso.holding = 0; // indicates whether or not a brick is being held
+	jso.turn = 'white'; // whose turn it is (initial value is opposite to first turn)
+	jso.confirmBlackVis = 0;
+	jso.confirmWhiteVis = 0;
+	jso.gonnaFlipAll = [];
+	jso.autoPassed = 0; // how many times in a row any player has been forced to pass
+	jso.confirmOffsetTop = 51; // white confirm buttons actual offsetTop
+	jso.board = [];
+	for (x = 0; x < jso.bWidth; x++) {
+		jso.board[x] = [];
+		for (y = 0; y < jso.bHeight; y++) {
+			jso.board[x][y] = {
+				state : 0,
+				color : 0
+			};
+		}
+	}
+
+}
+
 function prepareGame() {
+	clearTimeout(jso.timerRotate);
+	n.loading.style.opacity = '1';
+	n.loading.style.display = 'block'; 
 	rotateLoading();
+	resetGame();
 	setTimeout("fillHolders();", 600);
 	doPrepare();
 }
@@ -198,39 +234,39 @@ function prepareGame() {
 function setCanvasContexts() {
 	jso.white.ctx = n.white.getContext('2d');
 	jso.black.ctx = n.black.getContext('2d');
-	jso.white.piecectx = n.pieceWhite.getContext('2d');
-	jso.black.piecectx = n.pieceBlack.getContext('2d');
-	jso.white.pieceHeldctx = n.pieceWhiteHeld.getContext('2d');
-	jso.black.pieceHeldctx = n.pieceBlackHeld.getContext('2d');
+	jso.white.brickctx = n.brickWhite.getContext('2d');
+	jso.black.brickctx = n.brickBlack.getContext('2d');
+	jso.white.brickHeldctx = n.brickWhiteHeld.getContext('2d');
+	jso.black.brickHeldctx = n.brickBlackHeld.getContext('2d');
 	jso.ctx = n.can.getContext('2d');
 	jso.held = n.held.getContext('2d');
-	jso.held.drawImage(n.pieceBlackHeld, 0, 0);
+	jso.held.drawImage(n.brickBlackHeld, 0, 0);
 	
-	// Draw pieces on invisible canvases
+	// Draw bricks on invisible canvases
 	var imgB = new Image();
 	imgB.onload = function() {
-		jso.black.piecectx.drawImage(imgB, 0, 0);
+		jso.black.brickctx.drawImage(imgB, 0, 0);
 	};
-	imgB.src = 'jso/pic/piece-black.png';
+	imgB.src = 'jso/pic/brick-black.png';
 	
 	var imgW = new Image();
 	imgW.onload = function() {
-		jso.white.piecectx.drawImage(imgW, 0, 0);
+		jso.white.brickctx.drawImage(imgW, 0, 0);
 	};
-	imgW.src = 'jso/pic/piece-white.png';
+	imgW.src = 'jso/pic/brick-white.png';
 	
 	// Held
 	var imgBH = new Image();
 	imgBH.onload = function() {
-		jso.black.pieceHeldctx.drawImage(imgBH, 0, 0);
+		jso.black.brickHeldctx.drawImage(imgBH, 0, 0);
 	};
-	imgBH.src = 'jso/pic/piece-black-held.png';
+	imgBH.src = 'jso/pic/brick-black-held.png';
 	
 	var imgWH = new Image();
 	imgWH.onload = function() {
-		jso.white.pieceHeldctx.drawImage(imgWH, 0, 0);
+		jso.white.brickHeldctx.drawImage(imgWH, 0, 0);
 	};
-	imgWH.src = 'jso/pic/piece-white-held.png';
+	imgWH.src = 'jso/pic/brick-white-held.png';
 	
 	// "Unavailable" icon
 	try {
@@ -284,29 +320,30 @@ function touching(event, box) {
 }
 
 function stopGame() {
-	try {
-	jso.black.piecesFinal = 0;
-	jso.white.piecesFinal = 0;
-	// Loop through board and sum pieces up
+	n.held.style.display = 'none';
+	alert(n.held.style.display);
+	jso.black.bricksFinal = 0;
+	jso.white.bricksFinal = 0;
+	// Loop through board and sum bricks up
 	for (x in jso.board) {
 		for (y in jso.board[x]) {
 			if (jso.board[x][y].state === 1) {
-				jso[(jso.board[x][y].color)].piecesFinal++; // Increase corresponding piecesFinal
+				jso[(jso.board[x][y].color)].bricksFinal++; // Increase corresponding bricksFinal
 			}
 		}
 	}
 	var msgWhite = '';
 	var msgBlack = '';
-	if (jso.black.piecesFinal > jso.white.piecesFinal) {
-		msgWhite = 'You lost with ' + jso.white.piecesFinal + ' against ' + jso.black.piecesFinal + '.';
-		msgBlack = 'You won with ' + jso.black.piecesFinal + ' against ' + jso.white.piecesFinal + '.';
+	if (jso.black.bricksFinal > jso.white.bricksFinal) {
+		msgWhite = 'You lost with ' + jso.white.bricksFinal + ' against ' + jso.black.bricksFinal + '.';
+		msgBlack = 'You won with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
 	}
-	else if (jso.white.piecesFinal > jso.black.piecesFinal) {
-		msgWhite = 'You won with ' + jso.white.piecesFinal + 'against ' + jso.black.piecesFinal + '.';
-		msgBlack = 'You lost with ' + jso.black.piecesFinal + ' against ' + jso.white.piecesFinal + '.';
+	else if (jso.white.bricksFinal > jso.black.bricksFinal) {
+		msgWhite = 'You won with ' + jso.white.bricksFinal + ' against ' + jso.black.bricksFinal + '.';
+		msgBlack = 'You lost with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
 	}
 	else {
-		msgWhite = msgBlack = 'Tie: Both players have ' + jso.black.piecesFinal + ' pieces on the board.';
+		msgWhite = msgBlack = 'Tie: Both players have ' + jso.black.bricksFinal + ' bricks on the board.';
 	}
 	setTimeout(function() {
 		n.turnOverlayWhiteText.innerHTML = msgWhite;
@@ -317,12 +354,11 @@ function stopGame() {
 		n.turnOverlayBlack.style.opacity = '1';
 	}, 100);
 	
-	
-	} catch(e) {alert(e);}
 }
 
 function passTurn(color) {
-	if (canPlay(opp(color)) === false || (jso.black.pieces === 0 && jso.white.pieces === 0)) {
+	// previous player had to pass
+	if (canPlay(opp(color)) === false || (jso.black.bricks + jso.white.bricks === 0)) {
 		stopGame();
 	}
 	else {
@@ -334,7 +370,7 @@ function passTurn(color) {
 		}
 		setTimeout(function() {
 			nextTurn();
-		}, 1500);
+		}, 6500);
 	}
 }
 
@@ -365,7 +401,7 @@ try {
 				setTimeout(function() {
 					n.turnOverlayBlack.style.zIndex = '1100';
 					n.turnOverlayBlack.style.opacity = '1';
-				}, 100);	
+				}, 50);	
 			}
 			else {
 				// change to BLACK
@@ -373,28 +409,28 @@ try {
 				setTimeout(function() {
 					n.turnOverlayWhite.style.zIndex = '1100';
 					n.turnOverlayWhite.style.opacity = '1';
-				}, 100);
+				}, 50);
 			}
 		hideConfirm();
 		resetHeld(jso.turn);
 		if (canPlay(jso.turn) === true) {
 		//	alert(jso.turn + ' can play.');
-			if (jso[jso.turn].pieces === 0) {
-				removePiece(prevTurn);
-				addPiece(jso.turn);
+			if (jso[jso.turn].bricks === 0) {
+				removeBrick(prevTurn);
+				addBrick(jso.turn);
 			}
 			jso.autoPassed = 0;
 			if (jso.turn == 'white') {
 				n.turnOverlayWhite.style.opacity = '0';
 				setTimeout(function() {
 					n.turnOverlayWhite.style.zIndex = '-100';
-				}, 300);
+				}, 150);
 			}
 			else {
 				n.turnOverlayBlack.style.opacity = '0';
 				setTimeout(function() {
 					n.turnOverlayBlack.style.zIndex = '-100';
-				}, 300);
+				}, 150);
 			}
 		}
 		else {
@@ -438,19 +474,24 @@ function resetHeld(color) {
 		alert('ERROR: Function resetHeld requires that a color be specified.');
 		return;
 	}
+	n.held.height = jso.sqSize; // set held dimensions to match remaining bricks
+	if (jso[color].bricks > 3) {
+		n.held.width = jso[color].bricks * jso.thickness;
+	}
+	else {
+		n.held.width = 4*jso.thickness;
+	}
 	jso.held.clearRect(0, 0, n.held.width, n.held.height);
-	// place held on appropriate piece holder
+	// Place #held on appropriate brick holder
 	if (color === 'black') {
 		n.held.style.left = '96px';
 		n.held.style.top = '912px';
 	}
 	else if (color === 'white') {
-		var emptySpace = (jso.thickness * ((jso.piecesTotal/2) - jso[color].pieces));
+		var emptySpace = (jso.thickness * ((jso.bricksTotal/2) - jso[color].bricks));
 		n.held.style.left = (96 + emptySpace) + 'px';
 		n.held.style.top = '24px';
 	}
-	n.held.height = jso.sqSize; // set held dimensions to match remaining pieces
-	n.held.width = jso[color].pieces * jso.thickness;
 	setTimeout(function() { n.held.style.display = 'inline-block'; }, 5);
 }
 
@@ -459,7 +500,7 @@ function seize(event, color) {
 		if (jso.redSquare.present === true) {
 			unred(jso.redSquare.x, jso.redSquare.y);
 		}
-		removePiece(color);
+		removeBrick(color);
 		n.held.width = jso.heldSize;
 		n.held.height = jso.heldSize;
 		jso.holding = 1;
@@ -467,10 +508,10 @@ function seize(event, color) {
 		jso.move.y = event.targetTouches[0].pageY;
 		refreshHeld();
 		if (jso.turn == 'black') {
-			jso.held.drawImage(n.pieceBlackHeld, 0, 0, jso.heldSize, jso.heldSize);
+			jso.held.drawImage(n.brickBlackHeld, 0, 0, jso.heldSize, jso.heldSize);
 		}
 		else {
-			jso.held.drawImage(n.pieceWhiteHeld, 0, 0, jso.heldSize, jso.heldSize);
+			jso.held.drawImage(n.brickWhiteHeld, 0, 0, jso.heldSize, jso.heldSize);
 		}
 	}
 }
@@ -484,16 +525,19 @@ function move(event) {
 }
 
 function drop(event) {
+	if (!jso.changesMade) {
+		jso.changesMade = true;
+	}
 	if (jso.holding === 1) {
 		if ((jso.move.y > n.can.offsetTop && jso.move.y < (n.can.offsetTop+n.can.height)) && square(pixToSq(jso.move.x), pixToSq(jso.move.y-128)).state === 0) {
 			n.held.style.display = 'none';
 			var x = pixToSq(jso.move.x);
 			var y = pixToSq(jso.move.y-128);
-			placePiece(jso.turn, x, y);
+			setTimeout(function() { placeBrick(jso.turn, x, y); }, 1);
 		}
 		else {
 			n.held.style.display = 'none';
-			addPiece(jso.turn);
+			addBrick(jso.turn);
 			resetHeld(jso.turn);
 		}
 		jso.holding = 0;
@@ -522,13 +566,13 @@ function square(xPos, yPos) {
 	};
 }
 
-function flipPiece(x, y) {
+function flipBrick(x, y) {
 	var c = 'white';
 	if (jso.board[x][y].color === 'white') {
 		c = 'black';
 	}
 	clearSq(x, y);
-	drawPiece(c, x, y);
+	drawBrick(c, x, y);
 }
 
 function flips(c, xStart, yStart, xInc, yInc) {
@@ -581,21 +625,21 @@ function validateMove(color, x, y) {
 	return myReturn;
 }
 
-function drawPiece(color, xPos, yPos) {
+function drawBrick(color, xPos, yPos) {
 		jso.board[xPos][yPos].state = 1;
 		jso.board[xPos][yPos].color = color;
 		var xCoord = sqToPix(xPos);
 		var yCoord = sqToPix(yPos);
 		if (color === 'black') {
-			jso.ctx.drawImage(n.pieceBlack, xCoord, yCoord);
+			jso.ctx.drawImage(n.brickBlack, xCoord, yCoord);
 		}
 		else {
-			jso.ctx.drawImage(n.pieceWhite, xCoord, yCoord);
+			jso.ctx.drawImage(n.brickWhite, xCoord, yCoord);
 		}
 }
 
 function red(x, y) {
-	// make square (x, y) red if placing a piece there is not allowed
+	// make square (x, y) red if placing a brick there is not allowed
 	jso.redSquare.present = true; // tell engine that red square exists
 	jso.redSquare.x = x; // coords of red square
 	jso.redSquare.y = y;
@@ -612,14 +656,14 @@ function unred(x, y) {
 	clearSq(x, y);
 }
 
-function placePiece(color, xPos, yPos) {
+function placeBrick(color, xPos, yPos) {
 try {
 	if (!color || xPos === undefined || yPos === undefined) {
-		alert('ERROR: Function placePiece requires that parameters color, xPos, and yPos be specified.');
+		alert('ERROR: Function placeBrick requires that parameters color, xPos, and yPos be specified.');
 		return;
 	}
 	if (validateMove(color, xPos, yPos)) {
-		drawPiece(color, xPos, yPos);
+		drawBrick(color, xPos, yPos);
 		confirmMove();
 	}
 	else {
@@ -641,23 +685,32 @@ function clearSq(x, y) {
 function cancelMove() {
 	var x = pixToSq(jso.move.x);
 	var y = pixToSq(jso.move.y-128);
-	addPiece(jso.turn);
+	addBrick(jso.turn);
 	resetHeld(jso.turn);
 	clearSq(x, y);
 }
 
 function confirm() {
 	for (i in jso.gonnaFlipAll) {
-		flipPiece(jso.gonnaFlipAll[i][0], jso.gonnaFlipAll[i][1]);
+		flipBrick(jso.gonnaFlipAll[i][0], jso.gonnaFlipAll[i][1]);
 	}
 	nextTurn();
 }
 
 function newGame() {
-	if ((jso.playing === false) || (jso.playing === true && confirm('All current game progress will be lost if you start a new game. Are you sure?'))) {
+	if (jso.changesMade === false) {
 		hideMenu();
 		prepareGame();
 	}
+	else {
+		hideMenu();
+		prepareGame();
+	}
+}
+
+function showSettings() {
+	n.menuWrapper.style.WebkitTransform = 'translate3d(-768px, 0, 0)';
+	n.settingsWrapper.style.WebkitTransform = 'translate3d(-768px, 0, 0)';
 }
 
 function assignListeners() {
@@ -667,17 +720,28 @@ function assignListeners() {
 			newGame();
 		}
 	}, false);
-	/*
+	n.menuSettings.addEventListener('touchend', function() {
+		if (touching(event, n.menuSettings)) {
+			showSettings();
+		}
+	}, false);
+	n.menuResume.addEventListener('touchend', function() {
+		if (touching(event, n.menuResume)) {
+			hideMenu();
+		}
+	}, false);
 	// Menu button white
 	n.openMenuWhite.addEventListener('touchend', function() {
-		openMenu();
+		if (touching(event, n.openMenuWhite)) {
+			openMenu();
+		}
 	}, false);
 	// Menu button black
 	n.openMenuBlack.addEventListener('touchend', function() {
-		openMenu();
+		if (touching(event, n.openMenuBlack)) {
+			openMenu();
+		}
 	}, false);
-	*/
-	
 	n.held.addEventListener('touchstart', function() { seize(event, jso.turn); }, false);
 	n.held.addEventListener('touchmove', function() { move(event); }, false);
 	n.held.addEventListener('touchend', function() { drop(event); }, false);
@@ -717,17 +781,18 @@ function assignListeners() {
 	}, false);
 }
 
+function openMenu() {
+	if (jso.playing === true) {
+		n.menuResume.style.display = 'block';
+	}
+	var t = setTimeout(function() {
+		n.menuWrapper.style.WebkitTransform = 'translate3d(0, 0, 0)';
+	}, 100);
+}
+
 function hideMenu() {
 	var t = setTimeout(function() {
 		n.menuWrapper.style.WebkitTransform = 'translate3d(768px, 0, 0)';
-	
-	/*
-		n.menuWrapper.style.display = 'none';
-		n.menuWrapper.style.zIndex = '-3000';
-		n.menuResume.style.display = 'none';
-		n.menuResume.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
-		n.menuNew.style.WebkitTransform = 'translate3d(-600px, 0, 0)';
-		n.menuSettings.style.WebkitTransform = 'translate3d(-600px, 0, 0)';*/
 	}, 100);
 }
 
@@ -743,22 +808,17 @@ function prepareMenu() {
 	n.menuSettings.style.WebkitTransform = 'translate3d(0, 0, 0)';
 }
 
+window.onerror = function(e) {
+	alert(e);
+}
+
 function load() {
-
-try {
-
-
 	// Runs on page load.
 	checkComp();
 	n = getElementsWithId(); // All elements with ID
 	assignListeners();
 	setCanvasContexts();
-	prepareMenu();
-	
-	
-} catch(e) { alert(e); }
-
-
+	setTimeout(prepareMenu, 500);
 }
 
 function BlockMove(event) {
