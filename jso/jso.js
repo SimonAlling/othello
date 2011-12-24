@@ -180,11 +180,32 @@ function doPrepare() {
 		n.turnOverlayWhite.style.display = 'block';
 		n.turnOverlayBlack.style.display = 'block';
 		setTimeout('hideLoading()', 400);
+		
+		
+	// FAKE GAME, REMOVE 
+/*	try {
+	
+	jso.board[4][3].state = 1;
+	jso.board[4][3].color = 'black';
+	drawBrick('black', 4, 3);
+	jso.board[6][1].state = 1;
+	jso.board[6][1].color = 'white';
+	drawBrick('white', 6, 1);
+	
+	} catch(e)  { alert(e); }
+*/
+			// END OF FAKE
+		
+		
+		
+		
 		nextTurn();
 	}
 	else {
 		jso.prep = setTimeout("doPrepare()", 200);
 	}
+	
+	
 }
 
 function resetGame() {
@@ -320,40 +341,40 @@ function touching(event, box) {
 }
 
 function stopGame() {
-	n.held.style.display = 'none';
-	alert(n.held.style.display);
-	jso.black.bricksFinal = 0;
-	jso.white.bricksFinal = 0;
-	// Loop through board and sum bricks up
-	for (x in jso.board) {
-		for (y in jso.board[x]) {
-			if (jso.board[x][y].state === 1) {
-				jso[(jso.board[x][y].color)].bricksFinal++; // Increase corresponding bricksFinal
+	setTimeout(function() {
+		n.held.style.display = 'none';
+		jso.black.bricksFinal = 0;
+		jso.white.bricksFinal = 0;
+		// Loop through board and sum bricks up
+		for (x in jso.board) {
+			for (y in jso.board[x]) {
+				if (jso.board[x][y].state === 1) {
+					jso[(jso.board[x][y].color)].bricksFinal++; // Increase corresponding bricksFinal
+				}
 			}
 		}
-	}
-	var msgWhite = '';
-	var msgBlack = '';
-	if (jso.black.bricksFinal > jso.white.bricksFinal) {
-		msgWhite = 'You lost with ' + jso.white.bricksFinal + ' against ' + jso.black.bricksFinal + '.';
-		msgBlack = 'You won with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
-	}
-	else if (jso.white.bricksFinal > jso.black.bricksFinal) {
-		msgWhite = 'You won with ' + jso.white.bricksFinal + ' against ' + jso.black.bricksFinal + '.';
-		msgBlack = 'You lost with ' + jso.black.bricksFinal + ' against ' + jso.white.bricksFinal + '.';
-	}
-	else {
-		msgWhite = msgBlack = 'Tie: Both players have ' + jso.black.bricksFinal + ' bricks on the board.';
-	}
-	setTimeout(function() {
-		n.turnOverlayWhiteText.innerHTML = msgWhite;
-		n.turnOverlayWhite.style.zIndex = '1100';
-		n.turnOverlayWhite.style.opacity = '1';
-		n.turnOverlayBlackText.innerHTML = msgBlack;
-		n.turnOverlayBlack.style.zIndex = '1100';
-		n.turnOverlayBlack.style.opacity = '1';
-	}, 100);
-	
+		var msgWhite = '';
+		var msgBlack = '';
+		if (jso.black.bricksFinal > jso.white.bricksFinal) {
+			msgWhite = 'You lost with ' + jso.white.bricksFinal + ' to ' + jso.black.bricksFinal + '.';
+			msgBlack = 'You won with ' + jso.black.bricksFinal + ' to ' + jso.white.bricksFinal + '.';
+		}
+		else if (jso.white.bricksFinal > jso.black.bricksFinal) {
+			msgWhite = 'You won with ' + jso.white.bricksFinal + ' to ' + jso.black.bricksFinal + '.';
+			msgBlack = 'You lost with ' + jso.black.bricksFinal + ' to ' + jso.white.bricksFinal + '.';
+		}
+		else {
+			msgWhite = msgBlack = 'Tie: Both players have ' + jso.black.bricksFinal + ' bricks on the board.';
+		}
+		setTimeout(function() {
+			n.turnOverlayWhiteText.innerHTML = msgWhite;
+			n.turnOverlayWhite.style.zIndex = '1100';
+			n.turnOverlayWhite.style.opacity = '1';
+			n.turnOverlayBlackText.innerHTML = msgBlack;
+			n.turnOverlayBlack.style.zIndex = '1100';
+			n.turnOverlayBlack.style.opacity = '1';
+		}, 100);
+	}, 20);
 }
 
 function passTurn(color) {
@@ -470,29 +491,42 @@ function refreshHeld() {
 }
 
 function resetHeld(color) {
-	if (!color) {
-		alert('ERROR: Function resetHeld requires that a color be specified.');
-		return;
-	}
-	n.held.height = jso.sqSize; // set held dimensions to match remaining bricks
-	if (jso[color].bricks > 3) {
-		n.held.width = jso[color].bricks * jso.thickness;
-	}
-	else {
-		n.held.width = 4*jso.thickness;
-	}
-	jso.held.clearRect(0, 0, n.held.width, n.held.height);
-	// Place #held on appropriate brick holder
-	if (color === 'black') {
-		n.held.style.left = '96px';
-		n.held.style.top = '912px';
-	}
-	else if (color === 'white') {
-		var emptySpace = (jso.thickness * ((jso.bricksTotal/2) - jso[color].bricks));
-		n.held.style.left = (96 + emptySpace) + 'px';
-		n.held.style.top = '24px';
-	}
-	setTimeout(function() { n.held.style.display = 'inline-block'; }, 5);
+	setTimeout(function() {
+		if (!color) {
+			// Felmeddelande
+			alert('ERROR: Function resetHeld requires that a color be specified.');
+			return;
+		}
+		n.held.height = jso.sqSize; // set held dimensions to match remaining bricks
+		var isMoreThanMin = false;
+		if (jso[color].bricks > 3) {
+			isMoreThanMin = true;
+		}
+		if (isMoreThanMin === true) {
+			n.held.width = jso[color].bricks * jso.thickness;
+		}
+		else {
+			n.held.width = 4*jso.thickness;
+		}
+		jso.held.clearRect(0, 0, n.held.width, n.held.height);
+		// Place #held on appropriate brick holder
+		if (color === 'black') {
+			n.held.style.left = '96px';
+			n.held.style.top = '912px';
+		}
+		else if (color === 'white') {
+			if (isMoreThanMin === true) {
+				var emptySpace = (jso.thickness * ((jso.bricksTotal/2) - jso[color].bricks));
+				n.held.style.left = (96 + emptySpace) + 'px';
+				n.held.style.top = '24px';
+			}
+			else {
+				var emptySpace = (jso.thickness * ((jso.bricksTotal/2) - 4));
+				n.held.style.left = (96 + emptySpace) + 'px';
+				n.held.style.top = '24px';
+			}
+		}
+	n.held.style.display = 'inline-block'; }, 2);
 }
 
 function seize(event, color) {
@@ -834,7 +868,7 @@ function debug(action, variable) {
 			n.debug.innerHTML = variable;
 			break;
 		default:
-			alert('ERROR: Debuggning action unknown.');
+			alert('ERROR: Debugging action unknown.');
 			return false;
 	}
 }

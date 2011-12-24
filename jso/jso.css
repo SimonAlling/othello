@@ -358,8 +358,6 @@ body {
 }
 
 #held {
-			outline: 3px red solid; /*REMOVE*/
-	background-color: rgba(255,0,0,0.4); /* REMOVE */
 	left: 0px;
 	position: absolute;
 	top: 0px;
