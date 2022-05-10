@@ -3,6 +3,8 @@
 I wrote an [Othello](https://en.wikipedia.org/wiki/Reversi) clone for the iPad back in 2011, when I was 17.
 I think it can serve as a textbook example of how _not_ to write code … 😁 Looking at it a decade later as a professional software engineer with an MSc in computer science, I can barely fathom how I managed to get it working at all. 👀
 
+[**🎮 Play JS Othello!**](https://simonalling.github.io/othello/)
+
 ## About the commit history
 
 I had never heard about Git when I made this game; the commit history up to the addition of this readme is mechanically reconstructed from manual backups I created back in 2011 by simply copying the entire directory and zipping it.
